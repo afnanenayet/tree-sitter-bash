@@ -265,8 +265,17 @@
       "type": "SEQ",
       "members": [
         {
-          "type": "STRING",
-          "value": "for"
+          "type": "CHOICE",
+          "members": [
+            {
+              "type": "STRING",
+              "value": "for"
+            },
+            {
+              "type": "STRING",
+              "value": "select"
+            }
+          ]
         },
         {
           "type": "FIELD",
@@ -424,8 +433,17 @@
       "type": "SEQ",
       "members": [
         {
-          "type": "STRING",
-          "value": "while"
+          "type": "CHOICE",
+          "members": [
+            {
+              "type": "STRING",
+              "value": "while"
+            },
+            {
+              "type": "STRING",
+              "value": "until"
+            }
+          ]
         },
         {
           "type": "FIELD",
@@ -2041,7 +2059,7 @@
         "value": -1,
         "content": {
           "type": "PATTERN",
-          "value": "([^\"`$\\\\]|\\\\(.|\\n))+"
+          "value": "([^\"`$\\\\]|\\\\(.|\\r?\\n))+"
         }
       }
     },
@@ -2452,29 +2470,56 @@
     "word": {
       "type": "TOKEN",
       "content": {
-        "type": "REPEAT1",
-        "content": {
-          "type": "CHOICE",
-          "members": [
-            {
-              "type": "PATTERN",
-              "value": "[^'\"<>{}\\[\\]()`$|&;\\\\\\s#]"
-            },
-            {
-              "type": "SEQ",
+        "type": "SEQ",
+        "members": [
+          {
+            "type": "CHOICE",
+            "members": [
+              {
+                "type": "PATTERN",
+                "value": "[^#'\"<>{}\\[\\]()`$|&;\\\\\\s]"
+              },
+              {
+                "type": "SEQ",
+                "members": [
+                  {
+                    "type": "STRING",
+                    "value": "\\"
+                  },
+                  {
+                    "type": "PATTERN",
+                    "value": "[^\\s]"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "REPEAT",
+            "content": {
+              "type": "CHOICE",
               "members": [
                 {
-                  "type": "STRING",
-                  "value": "\\"
+                  "type": "PATTERN",
+                  "value": "[^'\"<>{}\\[\\]()`$|&;\\\\\\s]"
                 },
                 {
-                  "type": "PATTERN",
-                  "value": "[^\\s]"
+                  "type": "SEQ",
+                  "members": [
+                    {
+                      "type": "STRING",
+                      "value": "\\"
+                    },
+                    {
+                      "type": "PATTERN",
+                      "value": "[^\\s]"
+                    }
+                  ]
                 }
               ]
             }
-          ]
-        }
+          }
+        ]
       }
     },
     "test_operator": {
@@ -2526,7 +2571,15 @@
     },
     {
       "type": "PATTERN",
-      "value": "\\\\?\\s"
+      "value": "\\s"
+    },
+    {
+      "type": "PATTERN",
+      "value": "\\\\\\r?\\n"
+    },
+    {
+      "type": "PATTERN",
+      "value": "\\\\( |\\t|\\v|\\f)"
     }
   ],
   "conflicts": [],

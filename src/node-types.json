@@ -1612,6 +1612,10 @@
     "named": true
   },
   {
+    "type": "select",
+    "named": false
+  },
+  {
     "type": "special_variable_name",
     "named": true
   },
@@ -1633,6 +1637,10 @@
   },
   {
     "type": "unsetenv",
+    "named": false
+  },
+  {
+    "type": "until",
     "named": false
   },
   {

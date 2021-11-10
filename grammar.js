@@ -8,7 +8,6 @@ const SPECIAL_CHARACTERS = [
   '|', '&', ';',
   '\\',
   '\\s',
-  '#',
 ];
 
 module.exports = grammar({
@@ -44,7 +43,9 @@ module.exports = grammar({
 
   extras: $ => [
     $.comment,
-    /\\?\s/,
+    /\s/,
+    /\\\r?\n/,
+    /\\( |\t|\v|\f)/
   ],
 
   supertypes: $ => [
@@ -112,7 +113,7 @@ module.exports = grammar({
     )),
 
     for_statement: $ => seq(
-      'for',
+      choice('for', 'select'),
       field('variable', $._simple_variable_name),
       optional(seq(
         'in',
@@ -139,7 +140,7 @@ module.exports = grammar({
     ),
 
     while_statement: $ => seq(
-      'while',
+      choice('while', 'until'),
       field('condition', $._terminated_statement),
       field('body', $.do_group)
     ),
@@ -465,7 +466,7 @@ module.exports = grammar({
       '"'
     ),
 
-    _string_content: $ => token(prec(-1, /([^"`$\\]|\\(.|\n))+/)),
+    _string_content: $ => token(prec(-1, /([^"`$\\]|\\(.|\r?\n))+/)),
 
     array: $ => seq(
       '(',
@@ -535,10 +536,16 @@ module.exports = grammar({
 
     _special_variable_name: $ => alias(choice('*', '@', '?', '-', '$', '0', '_'), $.special_variable_name),
 
-    word: $ => token(repeat1(choice(
-      noneOf(...SPECIAL_CHARACTERS),
-      seq('\\', noneOf('\\s'))
-    ))),
+    word: $ => token(seq(
+      choice(
+        noneOf('#', ...SPECIAL_CHARACTERS),
+        seq('\\', noneOf('\\s'))
+      ),
+      repeat(choice(
+        noneOf(...SPECIAL_CHARACTERS),
+        seq('\\', noneOf('\\s'))
+      ))
+    )),
 
     test_operator: $ => token(prec(1, seq('-', /[a-zA-Z]+/))),
 
