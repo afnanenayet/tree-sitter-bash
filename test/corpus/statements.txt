@@ -1108,9 +1108,8 @@ Test commands with regexes
       (extglob_pattern)
       (command_substitution
         (pipeline
-          (pipeline
-            (command (command_name (word)) (word) (word))
-            (command (command_name (word)) (raw_string)))
+          (command (command_name (word)) (word) (word))
+          (command (command_name (word)) (raw_string))
           (command (command_name (word)) (word) (raw_string))))
       (extglob_pattern)))
   (test_command
@@ -1342,6 +1341,7 @@ Variable declaration: export
 
 export PATH
 export FOOBAR PATH="$PATH:/usr/foobar/bin"
+export $FOO:$BAR
 
 --------------------------------------------------------------------------------
 
@@ -1355,7 +1355,14 @@ export FOOBAR PATH="$PATH:/usr/foobar/bin"
       (string
         (simple_expansion
           (variable_name))
-          (string_content)))))
+          (string_content))))
+  (declaration_command
+    (concatenation
+      (simple_expansion
+        (variable_name))
+      (word)
+      (simple_expansion
+        (variable_name)))))
 
 ================================================================================
 Variable declaration: command substitution with semi-colon
